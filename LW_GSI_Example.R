@@ -35,6 +35,7 @@ ruffe2$logW <- log(ruffe2$weight)
 #run linear model with log-transformed weight and length
 lm_lLlW <- lm(logW~logL, data = ruffe2)
 lm_lLlW
+summary(lm_lLlW) #show intercept, error & r2
 
 #quick plot of model
 log_LW_plot <- ggplot(data = ruffe2, aes(x = logL, y = logW)) + geom_point() + geom_smooth(method = 'lm')

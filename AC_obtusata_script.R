@@ -1,6 +1,8 @@
 ######Setup#####
 setwd("/Users/admir/Downloads/S.obtusata_Project")
-library("tidyverse")
+Packages <- c("tidyverse","xlsx")
+invisible(suppressPackageStartupMessages(lapply(Packages,library,character.only = TRUE)))
+
 
 ######Load files needed#####
 Obtusata_dat <- read.csv("AC_Sphyraena_obtusata_Dat_for_R.csv")
@@ -10,21 +12,21 @@ colnames(Obtusata_dat) <- c("Specimen_ID","Species","Location","Site","Date","To
 ######Calculating LWR#####
 
 #remove NAs from weight and total length
-Obtusata_sub <- subset(Obtusata_dat, !is.na(Weight) & !is.na(Total_Length))
+Obtusata_LWR <- subset(Obtusata_dat, !is.na(Weight) & !is.na(Total_Length))
 
 #log-transform L and W
-Obtusata_sub$logL <- log(Obtusata_sub$Total_Length)
-Obtusata_sub$logW <- log(Obtusata_sub$Weight)
+Obtusata_LWR$logL <- log(Obtusata_LWR$Total_Length)
+Obtusata_LWR$logW <- log(Obtusata_LWR$Weight)
 
 #create linear model with log-transformed W and L
-lm_lLlW <- lm(logW~logL, data = Obtusata_sub)
+lm_lLlW <- lm(logW~logL, data = Obtusata_LWR)
 lm_lLlW
-summary(Obtusata_lm_lLlW)
+summary(lm_lLlW)
 
 #plot model
-Obtusata_logLW_plot <- ggplot(data = Obtusata_sub, aes(x = logL, y = logW)) +
+Obtusata_logLW_plot <- ggplot(data = Obtusata_LWR, aes(x = logL, y = logW)) +
   geom_point() + geom_smooth(method = "lm")
-Obtusata_LW_plot <- ggplot(data = Obtusata_sub, aes(x = Total_Length, y = Weight)) +
+Obtusata_LW_plot <- ggplot(data = Obtusata_LWR, aes(x = Total_Length, y = Weight)) +
   geom_point()
 Obtusata_logLW_plot
 Obtusata_LW_plot
@@ -32,7 +34,50 @@ Obtusata_LW_plot
 #####Calculating GSI#####
 
 #remove NAs from gonad weight
-Obtusata_GSI_sub <- subset(Obtusata_dat, !is.na(Gonad_Weight))
+Obtusata_GSI <- subset(Obtusata_dat, !is.na(Gonad_Weight))
 
 #GSI
-Obtusata_GSI_sub$GSI <- (Obtusata_GSI_sub$Gonad_Weight/Obtusata_GSI_sub$Weight) * 100
+Obtusata_GSI$GSI <- (Obtusata_GSI$Gonad_Weight/(Obtusata_GSI$Weight - Obtusata_GSI$Gonad_Weight)) * 100
+ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = GSI)) + 
+  geom_point()
+
+mean(Obtusata_GSI[["GSI"]])
+
+Obtusata_GSI$logGSI <- log(Obtusata_GSI$GSI)
+ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = logGSI)) +
+  geom_point()
+
+#####Compare relationship between logGSI and total length/weight#####
+
+#logGSI and TL
+ggplot(data = Obtusata_GSI, aes(x = Total_Length, y = logGSI)) +
+  geom_point()
+
+#logGSI and Weight
+ggplot(data = Obtusata_GSI, aes(x = Weight, y = logGSI)) +
+  geom_point()
+
+#####GLM comparison#####
+
+#checking distribution of GSI data
+GSI_dist <- hist(Obtusata_GSI$GSI)
+
+#log transform TL, SL, and Weight
+Obtusata_GSI$logTL <- log(Obtusata_GSI$Total_Length)
+Obtusata_GSI$logSL <- log(Obtusata_GSI$Standard_Length)
+Obtusata_GSI$logWeight <- log(Obtusata_GSI$Weight)
+
+#making GLMs
+GSI_SL_glm <- glm(Obtusata_GSI$GSI~Obtusata_GSI$Standard_Length, family = Gamma(link = "log"))
+GSI_TL_glm <- glm(Obtusata_GSI$GSI~Obtusata_GSI$Total_Length, family = Gamma(link = "log"))
+GSI_Weight_glm <- glm(Obtusata_GSI$GSI~Obtusata_GSI$Weight, family = Gamma(link = "log"))
+
+
+#check significance of each model
+AIC(GSI_SL_glm)
+AIC(GSI_TL_glm) #most significant model
+AIC(GSI_Weight_glm)
+
+#####Exporting to Excel#####
+write.xlsx(Obtusata_GSI, file = "Sphyraena_obtusata.xlsx", sheetName = "Data", col.names = T, row.names = T, 
+           append = F)

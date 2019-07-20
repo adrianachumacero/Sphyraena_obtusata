@@ -1,6 +1,6 @@
 ######Setup#####
 setwd("/Users/admir/Downloads/S.obtusata_Project")
-Packages <- c("tidyverse","xlsx")
+Packages <- c("tidyverse")
 invisible(suppressPackageStartupMessages(lapply(Packages,library,character.only = TRUE)))
 
 
@@ -48,23 +48,14 @@ Weight_dist <- hist(Obtusata_LWR$Weight)
 Obtusata_GSI <- subset(Obtusata_dat, !is.na(Gonad_Weight))
 
 #GSI
-Obtusata_GSI$GSI <- (Obtusata_GSI$Gonad_Weight/(Obtusata_GSI$Weight - Obtusata_GSI$Gonad_Weight)) * 100
-ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = GSI)) + 
-  geom_point()
-
-Obtusata_GSI$GSI_2 <- (Obtusata_GSI$Gonad_Weight/Obtusata_GSI$Weight) * 100
-ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = GSI_2)) +
+Obtusata_GSI$GSI <- (Obtusata_GSI$Gonad_Weight/Obtusata_GSI$Weight) * 100
+ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = GSI)) +
   geom_point()
 
 mean(Obtusata_GSI[["GSI"]])
-mean(Obtusata_GSI[["GSI_2"]])
 
 Obtusata_GSI$logGSI <- log(Obtusata_GSI$GSI)
 ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = logGSI)) +
-  geom_point()
-
-Obtusata_GSI$logGSI_2 <- log(Obtusata_GSI$GSI_2)
-ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = logGSI_2)) +
   geom_point()
 
 #####Compare relationship between logGSI and total length/weight#####
@@ -73,21 +64,14 @@ ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = logGSI_2)) +
 ggplot(data = Obtusata_GSI, aes(x = Total_Length, y = logGSI)) +
   geom_point()
 
-ggplot(data = Obtusata_GSI, aes(x = Total_Length, y = logGSI_2)) +
-  geom_point()
-
 #logGSI and Weight
 ggplot(data = Obtusata_GSI, aes(x = Weight, y = logGSI)) +
-  geom_point()
-
-ggplot(data = Obtusata_GSI, aes(x = Weight, y = logGSI_2)) +
   geom_point()
 
 #####GLM comparison#####
 
 #checking distribution of GSI data
 GSI_dist <- hist(Obtusata_GSI$GSI)
-GSI_dist <- hist(Obtusata_GSI$GSI_2)
 
 #log transform TL, SL, and Weight
 Obtusata_GSI$logTL <- log(Obtusata_GSI$Total_Length)
@@ -100,19 +84,10 @@ GSI_SL_glm <- glm(Obtusata_GSI$GSI~Obtusata_GSI$Standard_Length, family = Gamma(
 GSI_TL_glm <- glm(Obtusata_GSI$GSI~Obtusata_GSI$Total_Length, family = Gamma(link = "log"))
 GSI_Weight_glm <- glm(Obtusata_GSI$GSI~Obtusata_GSI$Weight, family = Gamma(link = "log"))
 
-GSI2_SL_glm <- glm(Obtusata_GSI$GSI_2~Obtusata_GSI$Standard_Length, family = Gamma(link = "log"))
-GSI2_TL_glm <- glm(Obtusata_GSI$GSI_2~Obtusata_GSI$Total_Length, family = Gamma(link = "log"))
-GSI2_Weight_glm <- glm(Obtusata_GSI$GSI_2~Obtusata_GSI$Weight, family = Gamma(link = "log"))
-
-
 #check significance of each model
 AIC(GSI_SL_glm)
 AIC(GSI_TL_glm) #most significant model
 AIC(GSI_Weight_glm)
-
-AIC(GSI2_SL_glm)
-AIC(GSI2_TL_glm) #still most significant model
-AIC(GSI2_Weight_glm)
 
 #####Exporting to Excel#####
 write.xlsx(Obtusata_GSI, file = "Sphyraena_obtusata.xlsx", sheetName = "Data", col.names = T, row.names = T, 

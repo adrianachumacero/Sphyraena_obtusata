@@ -45,12 +45,12 @@ Obtusata_full_LW_plot
 Obtusata_full_GSI <- subset(Obtusata_full, !is.na(Gonad_Weight))
 
 #GSI
-Obtusata_full_GSI$GSI <- (Obtusata_full_GSI$Gonad_Weight/(Obtusata_full_GSI$Weight - Obtusata_full_GSI$Gonad_Weight)) * 100
-ggplot(data = Obtusata_full_GSI, aes(x = Standard_Length, y = GSI)) + 
+Obtusata_full_GSI$GSI <- (Obtusata_full_GSI$Gonad_Weight/Obtusata_full_GSI$Weight) * 100
+ggplot(data = Obtusata_full_GSI, aes(x = Standard_Length, y = GSI, colour = Location)) + 
   geom_point()
 
 mean(Obtusata_full_GSI[["GSI"]])
 
 Obtusata_full_GSI$logGSI <- log(Obtusata_full_GSI$GSI)
-ggplot(data = Obtusata_full_GSI, aes(x = Standard_Length, y = logGSI)) +
+ggplot(data = Obtusata_full_GSI, aes(x = Standard_Length, y = logGSI, colour = Location)) +
   geom_point()

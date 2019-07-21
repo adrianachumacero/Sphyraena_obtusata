@@ -25,22 +25,21 @@ summary(lm_lLlW)
 
 #plot model
 Obtusata_logLW_plot <- ggplot(data = Obtusata_LWR, aes(x = logL, y = logW)) +
-  geom_point() + geom_smooth(method = "lm")
+  geom_point() + geom_smooth(method = "lm") + ggtitle(label = "logLWR of S.obtusata in Dumaguete")
 Obtusata_LW_plot <- ggplot(data = Obtusata_LWR, aes(x = Total_Length, y = Weight)) +
-  geom_point()
+  geom_point() + ggtitle(label = "LWR of S.obtusata in Dumaguete")
 Obtusata_logLW_plot
 Obtusata_LW_plot
 
 #another plot but with axes names
-coef(lm_lLlW)
-exp(-5.630074)
-
-plot(Obtusata_LWR$logW~Obtusata_LWR$logL, pch=19, col="black", xlab="logLength (cm)", ylab= "logWeight (g)")
-plot(Obtusata_LWR$Weight~Obtusata_LWR$Total_Length, pch=19, col="black", xlab="Length (cm)", ylab= "Weight (g)")
+plot(Obtusata_LWR$logW~Obtusata_LWR$logL, pch=19, col="black", xlab="logLength (cm)", ylab= "logWeight (g)",
+     main = "logLWR of S.obtusata in Dumaguete")
+plot(Obtusata_LWR$Weight~Obtusata_LWR$Total_Length, pch=19, col="black", xlab="Length (cm)", ylab= "Weight (g)", 
+     main = "LWR of S.obtusata in Dumaguete")
 
 #checking distribution of LWR data
 Length_dist <- hist(Obtusata_LWR$Total_Length)
-Weight_dist <- hist(Obtusata_LWR$Weight)
+##Weight_dist <- hist(Obtusata_LWR$Weight)
 
 #####Calculating GSI#####
 
@@ -49,34 +48,32 @@ Obtusata_GSI <- subset(Obtusata_dat, !is.na(Gonad_Weight))
 
 #GSI
 Obtusata_GSI$GSI <- (Obtusata_GSI$Gonad_Weight/Obtusata_GSI$Weight) * 100
-ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = GSI)) +
-  geom_point()
+##ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = GSI)) + geom_point()
 
 mean(Obtusata_GSI[["GSI"]])
 
 Obtusata_GSI$logGSI <- log(Obtusata_GSI$GSI)
-ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = logGSI)) +
-  geom_point()
+##ggplot(data = Obtusata_GSI, aes(x = Standard_Length, y = logGSI)) + geom_point()
 
 #####Compare relationship between logGSI and total length/weight#####
 
-#logGSI and TL
-ggplot(data = Obtusata_GSI, aes(x = Total_Length, y = logGSI)) +
-  geom_point()
+#raw GSI and TL
+ggplot(data = Obtusata_GSI, aes(x = Total_Length, y = GSI)) +
+  geom_point() + ggtitle(label = "Relationship between GSI and total length", subtitle = "S.obtusata in Dumaguete")
 
 #logGSI and Weight
-ggplot(data = Obtusata_GSI, aes(x = Weight, y = logGSI)) +
-  geom_point()
+##ggplot(data = Obtusata_GSI, aes(x = Weight, y = logGSI)) + geom_point()
 
 #####GLM comparison#####
 
 #checking distribution of GSI data
 GSI_dist <- hist(Obtusata_GSI$GSI)
+plot(GSI_dist, xlab = "GSI", ylab = "Frequency", main = "Distribution of GSI for Dumaguete")
 
 #log transform TL, SL, and Weight
-Obtusata_GSI$logTL <- log(Obtusata_GSI$Total_Length)
-Obtusata_GSI$logSL <- log(Obtusata_GSI$Standard_Length)
-Obtusata_GSI$logWeight <- log(Obtusata_GSI$Weight)
+##Obtusata_GSI$logTL <- log(Obtusata_GSI$Total_Length)
+##Obtusata_GSI$logSL <- log(Obtusata_GSI$Standard_Length)
+##Obtusata_GSI$logWeight <- log(Obtusata_GSI$Weight)
 
 
 #making GLMs

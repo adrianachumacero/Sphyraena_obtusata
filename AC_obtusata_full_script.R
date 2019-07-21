@@ -33,9 +33,9 @@ summary(full_lm_lLlW)
 
 #plot model
 Obtusata_full_logLW_plot <- ggplot(data = Obtusata_full_LWR, aes(x = logL, y = logW, colour = Location)) +
-  geom_point() + geom_smooth(method = "lm")
+  geom_point() + geom_smooth(method = "lm") + ggtitle(label = "logLWR of S.obtusata from 2 populations")
 Obtusata_full_LW_plot <- ggplot(data = Obtusata_full_LWR, aes(x = Total_Length, y = Weight, colour = Location)) +
-  geom_point()
+  geom_point() + ggtitle(label = "LWR of S.obtusata from 2 populations")
 Obtusata_full_logLW_plot
 Obtusata_full_LW_plot
 
@@ -44,13 +44,12 @@ Obtusata_full_LW_plot
 #remove NAs from gonad weight
 Obtusata_full_GSI <- subset(Obtusata_full, !is.na(Gonad_Weight))
 
-#GSI
+#raw GSI and TL
 Obtusata_full_GSI$GSI <- (Obtusata_full_GSI$Gonad_Weight/Obtusata_full_GSI$Weight) * 100
-ggplot(data = Obtusata_full_GSI, aes(x = Standard_Length, y = GSI, colour = Location)) + 
-  geom_point()
+ggplot(data = Obtusata_full_GSI, aes(x = Total_Length, y = GSI, colour = Location)) + 
+  geom_point() + ggtitle(label = "Relationship between GSI and total length", subtitle = "From 2 populations")
 
 mean(Obtusata_full_GSI[["GSI"]])
 
 Obtusata_full_GSI$logGSI <- log(Obtusata_full_GSI$GSI)
-ggplot(data = Obtusata_full_GSI, aes(x = Standard_Length, y = logGSI, colour = Location)) +
-  geom_point()
+##ggplot(data = Obtusata_full_GSI, aes(x = Standard_Length, y = logGSI, colour = Location)) + geom_point()

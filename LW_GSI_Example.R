@@ -39,7 +39,7 @@ summary(lm_lLlW) #show intercept, error & r2
 
 #quick plot of model
 log_LW_plot <- ggplot(data = ruffe2, aes(x = logL, y = logW)) + geom_point() + geom_smooth(method = 'lm')
-LW_plot <- ggplot(data = ruffe2, aes(x = length, y = weight)) + geom_point()
+LW_plot <- ggplot(data = ruffe2, aes(x = length, y = weight)) + geom_point() + geom_smooth(method = 'auto') + annotate(geom = "text", x = 50, y = 75, label = "power curve")
 log_LW_plot
 LW_plot
 
@@ -55,3 +55,11 @@ Ccarpio_df <- data.frame(fish_ID, fish_body_weight, fish_gonad_weight)
 
 #calculate GSI
 Ccarpio_df$GSI <- (Ccarpio_df$fish_gonad_weight / Ccarpio_df$fish_body_weight) * 100
+
+##############################################################################################################################################
+
+######## anova example ########
+
+lm_1 <- lm(logW ~ logL, data = ruffe2[1:368,])
+lm_2 <- lm(logL ~ logW, data = ruffe2[369:736,])
+anova(lm_1, lm_2)

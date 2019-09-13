@@ -26,7 +26,9 @@ summary(KAL_lm_lLlW)
 Obtusata_KAL_logLW_plot <- ggplot(data = Obtusata_KAL_LWR, aes(x = logL, y = logW)) +
   geom_point() + geom_smooth(method = "lm") + ggtitle(label = "logLWR of S.obtusata in Kalibo")
 Obtusata_KAL_LW_plot <- ggplot(data = Obtusata_KAL_LWR, aes(x = Total_Length, y = Weight)) +
-  geom_point() + ggtitle(label = "LWR of S.obtusata in Kalibo")
+  geom_point() + geom_smooth(method = "nls", formula = y ~ a*x^b, start = list(a = -5.51630, b = 3.10647), data = Obtusata_KAL_LWR, se = F) + 
+  ggtitle(label = "LWR of S.obtusata in Kalibo")
+
 Obtusata_KAL_logLW_plot
 Obtusata_KAL_LW_plot
 

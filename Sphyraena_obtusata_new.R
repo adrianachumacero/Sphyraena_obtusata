@@ -1,5 +1,5 @@
 ######Setup#####
-setwd("/Users/admir/Downloads/S.obtusata_Project")
+setwd("/Users/admir/Downloads/S.obtusata_Project/Sphyraena_obtusata")
 Packages <- c("tidyverse")
 invisible(suppressPackageStartupMessages(lapply(Packages,library,character.only = TRUE)))
 
@@ -48,6 +48,9 @@ ggplot(data = Obtusata_DGT_GSI, aes(x = Total_Length, y = GSI)) +
 
 mean(Obtusata_DGT_GSI[["GSI"]])
 
+#####Calculating Fulton's Condition Factor#####
+Obtusata_DGT$K <- 100 * (Obtusata_DGT$Weight/(Obtusata_DGT$Total_Length)^3)
+
 ####################Kalibo####################
 #####Calculating LWR#####
 
@@ -88,6 +91,8 @@ ggplot(data = Obtusata_KAL_GSI, aes(x = Total_Length, y = GSI)) +
 
 mean(Obtusata_KAL_GSI[["GSI"]])
 
+#####Calculating Fulton's Condition Factor#####
+Obtusata_KAL$K <- 100 * (Obtusata_KAL$Weight/(Obtusata_KAL$Total_Length)^3)
 
 ####################Both####################
 #####Calculating LWR#####

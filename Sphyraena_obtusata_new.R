@@ -130,3 +130,39 @@ ggplot(data = Obtusata_full_GSI, aes(x = Total_Length, y = GSI, colour = Locatio
   geom_point() + ggtitle(label = "Relationship between GSI and total length", subtitle = "From 2 populations")
 
 mean(Obtusata_full_GSI[["GSI"]])
+
+####################Sub-setting data to include only lengths seen in Dumaguete AND Kalibo####################
+####Sub-setting for total length between 21cm and 30cm#####
+
+Obtusata_sub <- subset(Obtusata, Total_Length > 21 & Total_Length < 30)
+
+#####Running the rest of my analysis on subset dataframe#####
+
+#log transform L and W
+Obtusata_sub$logL <- log(Obtusata_sub$Total_Length)
+Obtusata_sub$logW <- log(Obtusata_sub$Weight)
+
+#create linear model with log-transformed W and L
+full_lm_lLlW <- lm(logW~logL, data = Obtusata_sub)
+full_lm_lLlW
+summary(full_lm_lLlW)
+
+#plot model
+Obtusata_sub_logLW_plot <- ggplot(data = Obtusata_sub, aes(x = logL, y = logW, colour = Location)) +
+  geom_point() + geom_smooth(method = "lm") + ggtitle(label = "logLWR of S.obtusata from 2 populations")
+Obtusata_sub_LW_plot <- ggplot(data = Obtusata_sub, aes(x = Total_Length, y = Weight, colour = Location)) +
+  geom_point() + geom_smooth(method = "nls", formula = y ~ a*x^b, start = list(a = 0.0035597, b = 3.059256), data = Obtusata_sub, se = F) +
+  ggtitle(label = "LWR of S.obtusata from 2 populations")
+
+Obtusata_sub_logLW_plot
+Obtusata_sub_LW_plot
+
+#####Calculating GSI#####
+
+#remove NAs from gonad weight
+Obtusata_sub_GSI <- subset(Obtusata_sub, !is.na(Gonad_Weight))
+
+#raw GSI and TL
+Obtusata_sub_GSI$GSI <- (Obtusata_sub_GSI$Gonad_Weight/Obtusata_sub_GSI$Weight) * 100
+ggplot(data = Obtusata_sub_GSI, aes(x = Total_Length, y = GSI, colour = Location)) + 
+  geom_point() + ggtitle(label = "Relationship between GSI and total length", subtitle = "From 2 populations")

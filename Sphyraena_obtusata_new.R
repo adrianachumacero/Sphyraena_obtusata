@@ -166,3 +166,18 @@ Obtusata_sub_GSI <- subset(Obtusata_sub, !is.na(Gonad_Weight))
 Obtusata_sub_GSI$GSI <- (Obtusata_sub_GSI$Gonad_Weight/Obtusata_sub_GSI$Weight) * 100
 ggplot(data = Obtusata_sub_GSI, aes(x = Total_Length, y = GSI, colour = Location)) + 
   geom_point() + ggtitle(label = "Relationship between GSI and total length", subtitle = "From 2 populations")
+
+#####BOXPLOTS#####
+
+boxplot(GSI~Location, data=Obtusata_sub_GSI, main="GSI by location", 
+        xlab="Location", ylab="GSI", col=(c("red","blue")))
+boxplot(Total_Length~Location, data=Obtusata_sub, main="Total length by location", 
+        xlab="Location", ylab="Total Length", col=(c("red","blue")))
+boxplot(Weight~Location, data=Obtusata_sub, main="Weight by location", 
+        xlab="Location", ylab="Weight", col=(c("red","blue")))
+
+#####MANN - WHITNEY U TEST#####
+
+wilcox.test(Obtusata_sub_GSI$GSI~Obtusata_sub_GSI$Location)
+wilcox.test(Obtusata_sub$Total_Length~Obtusata_sub$Location)
+wilcox.test(Obtusata_sub$Weight~Obtusata_sub$Location)

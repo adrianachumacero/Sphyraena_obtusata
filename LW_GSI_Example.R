@@ -10,12 +10,13 @@
 remove(list = ls())
 
 #Set working directory
-setwd("C:/Users/rclar/Dropbox/Pinsky_Lab/PIRE_Proj/REU_Summer_2019/Adriana_Project/")
+setwd("C:/Users/rclar/Dropbox/Pinsky_Lab/PIRE_Proj/REU_Summer_2019/Adriana_Project/Sphyraena_obtusata/")
 getwd()
 
 #load libraries
-library("FSAdata")
-library("tidyverse")
+library(FSAdata)
+library(tidyverse)
+library(ggpubr)
 
 #read in data
 data(RuffeSLRH92)
@@ -23,10 +24,50 @@ str(RuffeSLRH92)
 
 ################################################################################################################################################
 
-######## Calculate length-weight relationship ########
+######## Check for normality w/raw data########
 
 #clean dataset to remove individuals with NAs for weight and length
 ruffe2 <- subset(RuffeSLRH92, !is.na(weight) & !is.na(length))
+
+#density plot to see if distribution of length is normal
+length_density <- ggdensity(ruffe2$length,
+                            main = "Density plot of length",
+                            xlab = "Fish length")
+length_density #want to see if there is a bell curve or not (here, it is roughly bell-shaped)
+
+#Q-Q plot (quantile-quantile) to see if distribution of length is normal
+length_qq <- ggqqplot(ruffe2$length)
+length_qq #want to see data points falling on 45-degree line or within CI (shaded region) here, tailing off at the end, suggesting curve is skewed to left -- more samples than would expect with short lengths and fewer samples than would expect with long lengths
+
+#Shapiro-Wilk's test for normality for length
+length_shapiro <- shapiro.test(ruffe2$length) #visualization (density & Q-Q plots) is useful but statistical test most powerful
+length_shapiro #here, p-value tells whether distribution is significantly different from normal or not. If p > 0.05, then distribution is different than normal (here, it is)
+
+######## Check for normality w/log-transformed data########
+
+#since raw data is not normally distributed, log-transform dataa & check for normality
+ruffe2$logL <- log(ruffe2$length) #add column to dataframe that has log-transformed length
+
+#density plot to see if distribution of log-transformed length is normal
+log_length_density <- ggdensity(ruffe2$logL,
+                            main = "Density plot of log-transformed length",
+                            xlab = "Log-transformed length")
+log_length_density #now curve heavily skewed to right
+
+#Q-Q plot (quantile-quantile) to see if distribution of log-transformed length is normal
+log_length_qq <- ggqqplot(ruffe2$logL)
+log_length_qq #now even farther off 45-degree line
+
+#Shapiro-Wilk's test for normality for log-transformed length
+log_length_shapiro <- shapiro.test(ruffe2$logL) 
+log_length_shapiro #unsurprisingly (given results of visualization), log-transformed data even less of a normal distribution than before
+
+#BUT since using very large dataset (n > 30), can assume Central Limit Theorem holds and proceed as if normally distributed
+#Always important to check, however bc if raw data was very skewed may run into issues later down the line (here, raw distribution looks ~bell-shaped)
+
+################################################################################################################################################
+
+######## Calculate length-weight relationship ########
 
 #log-transform length and weight
 ruffe2$logL <- log(ruffe2$length) #add column to dataframe that has log-transformed length

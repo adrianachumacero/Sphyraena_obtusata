@@ -17,6 +17,7 @@ getwd()
 library(FSAdata)
 library(tidyverse)
 library(ggpubr)
+library(Rmisc)
 
 #read in data
 data(RuffeSLRH92)
@@ -67,11 +68,28 @@ log_length_shapiro #unsurprisingly (given results of visualization), log-transfo
 
 ################################################################################################################################################
 
+######## Calculate 95% CI for mean length ########
+
+#calculate length statistics
+length_mean <- mean(ruffe2$length) #calculate mean
+length_SD <- sd(ruffe2$length) #calculate standard deviation
+length_n <- 736 #set sample size
+
+#calculate standard error for length
+length_SE <- qnorm(0.975)*(length_SD/sqrt(length_n)) #calculate standard error by hand for 95% CI
+
+#get bounds for 95% CI
+lower_bound_length_CI <- length_mean - length_SE
+upper_bound_length_CI <- length_mean + length_SE
+
+length_95_CI <- CI(ruffe2$length, ci = 0.95) #another way to get confidence interval using Rmisc package
+
+################################################################################################################################################
+
 ######## Calculate length-weight relationship ########
 
-#log-transform length and weight
-ruffe2$logL <- log(ruffe2$length) #add column to dataframe that has log-transformed length
-ruffe2$logW <- log(ruffe2$weight)
+#log-transform weight
+ruffe2$logW <- log(ruffe2$weight) #add column to dataframe that has log-transformed weight
 
 #run linear model with log-transformed weight and length
 lm_lLlW <- lm(logW~logL, data = ruffe2)

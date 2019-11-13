@@ -1,76 +1,68 @@
 ######Setup#####
-setwd("/Users/admir/Downloads/S.obtusata_Project")
+setwd("/Users/admir/Downloads/S.obtusata_Project/Sphyraena_obtusata/")
 Packages <- c("tidyverse")
 invisible(suppressPackageStartupMessages(lapply(Packages,library,character.only = TRUE)))
 
 ######Load files needed#####
-Obtusata_1 <- read.csv("AC_Sphyraena_obtusata_Dat_for_R.csv")
-Obtusata_2 <- read.csv("Sphyraena_obtusata_KAL.csv")
-colnames(Obtusata_1) <- c("Specimen_ID","Species","Location","Site","Date","Total_Length",
+Obtusata <- read.csv("AC_Sphyraena_obtusata_Dat_for_R.csv")
+
+colnames(Obtusata) <- c("Specimen_ID","Species","Location","Site","Date","Total_Length",
                             "Standard_Length","Weight","Gonad_Weight")
-colnames(Obtusata_2) <- c("Specimen_ID","Species","Location","Site","Date","Total_Length",
-                          "Standard_Length","Weight","Gonad_Weight")
-
-#####Join Dumaguete and Kalibo dataframes#####
-
-#using merge
-Obtusata_full <- merge(Obtusata_1, Obtusata_2, by = c("Specimen_ID", "Species", "Location", "Site", "Date",
-                                                      "Total_Length", "Standard_Length", "Weight", "Gonad_Weight"), all = TRUE)
 
 ######Calculating LWR#####
 
 #remove NAs from weight and total length
-Obtusata_full_LWR <- subset(Obtusata_full, !is.na(Weight) & !is.na(Total_Length))
+Obtusata_LWR <- subset(Obtusata, !is.na(Weight) & !is.na(Total_Length))
 
 #log-transform L and W
-Obtusata_full_LWR$logL <- log(Obtusata_full_LWR$Total_Length)
-Obtusata_full_LWR$logW <- log(Obtusata_full_LWR$Weight)
+Obtusata_LWR$logL <- log(Obtusata_LWR$Total_Length)
+Obtusata_LWR$logW <- log(Obtusata_LWR$Weight)
 
 #create linear model with log-transformed W and L
-full_lm_lLlW <- lm(logW~logL, data = Obtusata_full_LWR)
+full_lm_lLlW <- lm(logW~logL, data = Obtusata_LWR)
 full_lm_lLlW
 summary(full_lm_lLlW)
 
 #plot model
-Obtusata_full_logLW_plot <- ggplot(data = Obtusata_full_LWR, aes(x = logL, y = logW, colour = Location)) +
+Obtusata_logLW_plot <- ggplot(data = Obtusata_LWR, aes(x = logL, y = logW, colour = Location)) +
   geom_point() + geom_smooth(method = "lm") + ggtitle(label = "logLWR of S.obtusata from 2 populations")
-Obtusata_full_LW_plot <- ggplot(data = Obtusata_full_LWR, aes(x = Total_Length, y = Weight, colour = Location)) +
-  geom_point() + geom_smooth(method = "nls", formula = y ~ a*x^b, start = list(a = -6.16923, b = 3.24846), data = Obtusata_full_LWR, se = F) +
+Obtusata_LW_plot <- ggplot(data = Obtusata_LWR, aes(x = Total_Length, y = Weight, colour = Location)) +
+  geom_point() + geom_smooth(method = "nls", formula = y ~ a*x^b, start = list(a = -6.16923, b = 3.24846), data = Obtusata_LWR, se = F) +
   ggtitle(label = "LWR of S.obtusata from 2 populations")
 
-Obtusata_full_logLW_plot
-Obtusata_full_LW_plot
+Obtusata_logLW_plot
+Obtusata_LW_plot
 
 #####Calculating GSI#####
 
 #remove NAs from gonad weight
-Obtusata_full_GSI <- subset(Obtusata_full, !is.na(Gonad_Weight))
+Obtusata_GSI <- subset(Obtusata, !is.na(Gonad_Weight))
 
 #raw GSI and TL
-Obtusata_full_GSI$GSI <- (Obtusata_full_GSI$Gonad_Weight/Obtusata_full_GSI$Weight) * 100
-ggplot(data = Obtusata_full_GSI, aes(x = Total_Length, y = GSI, colour = Location)) + 
+Obtusata_GSI$GSI <- (Obtusata_GSI$Gonad_Weight/Obtusata_GSI$Weight) * 100
+ggplot(data = Obtusata_GSI, aes(x = Total_Length, y = GSI, colour = Location)) + 
   geom_point() + ggtitle(label = "Relationship between GSI and total length", subtitle = "From 2 populations")
 
-mean(Obtusata_full_GSI[["GSI"]])
+mean(Obtusata_GSI[["GSI"]])
 
-Obtusata_full_GSI$logGSI <- log(Obtusata_full_GSI$GSI)
+Obtusata_GSI$logGSI <- log(Obtusata_GSI$GSI)
 ##ggplot(data = Obtusata_full_GSI, aes(x = Standard_Length, y = logGSI, colour = Location)) + geom_point()
 
 #####GLMs#####
 
-GSI_full_TL_glm <- glm(Obtusata_full_GSI$GSI~Obtusata_full_GSI$Total_Length, family = "Gamma")
-GSI_full_Weight_glm <- glm(Obtusata_full_GSI$GSI~Obtusata_full_GSI$Weight, family = "Gamma")
+GSI_TL_glm <- glm(Obtusata_GSI$GSI~Obtusata_GSI$Total_Length, family = "Gamma")
+GSI_Weight_glm <- glm(Obtusata_GSI$GSI~Obtusata_GSI$Weight, family = "Gamma")
 
-AIC(GSI_full_TL_glm)
-AIC(GSI_full_Weight_glm)
+AIC(GSI_TL_glm)
+AIC(GSI_Weight_glm)
 
 #####Boxplot#####
 
-boxplot(GSI~Location, data=Obtusata_full_GSI, main="GSI by location", 
+boxplot(GSI~Location, data=Obtusata_GSI, main="GSI by location", 
         xlab="Location", ylab="GSI", col=(c("red","blue")))
-boxplot(Total_Length~Location, data=Obtusata_full_GSI, main="Total length by location", 
+boxplot(Total_Length~Location, data=Obtusata_GSI, main="Total length by location", 
         xlab="Location", ylab="Total Length", col=(c("red","blue")))
-boxplot(Weight~Location, data=Obtusata_full_GSI, main="Weight by location", 
+boxplot(Weight~Location, data=Obtusata_GSI, main="Weight by location", 
         xlab="Location", ylab="Weight", col=(c("red","blue")))
 
 #####Normality test#####
